@@ -9,6 +9,8 @@ jobs:
         run: sudo apt install emacs; bash ./lisp-format src/AVLDict.lisp > AVLDict_form.lisp
       - name: Compare with format
         run: diff src/AVLDict.lisp AVLDict_form.lisp
+      - name: Download artifacts
+        uses: actions/download-artifact@v3
   test:
     runs-on: ubuntu-latest
     steps:
