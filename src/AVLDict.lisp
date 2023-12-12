@@ -73,6 +73,15 @@
     (t 
       (< n1 n2))))
 
+(defun universal> (n1 n2)
+  (cond
+    ((type_equal 'n1 'n2)
+      (make-condition 'types_not_equal))
+    ((typep n1 'string) 
+      (string> n1 n2))
+    (t 
+      (> n1 n2))))
+
 (defun universal= (n1 n2)
   (cond
     ((type_equal 'n1 'n2)
@@ -81,6 +90,15 @@
       (string= n1 n2))
     (t 
       (= n1 n2))))
+
+(defun universal+ (n1 n2)
+  (cond
+    ((type_equal 'n1 'n2)
+      (make-condition 'types_not_equal))
+    ((typep n1 'string) 
+      (concatenate 'string n1 n2))
+    (t 
+      (+ n1 n2))))
 
 (defun rotate_rigth (p)
   (let ((q (get_left p)))
@@ -106,11 +124,11 @@
       (rotate_rigth p)))
     (t p)))
   
-(defun insert (node key value)
+(defun insert_tree (node key value)
   (cond
     ((not node) (create_node key value))
-    ((universal< key (get_key node)) (balance (set_left node (insert (get_left node) key value))))
-    (t (balance (set_right node (insert (get_right node) key value))))))
+    ((universal< key (get_key node)) (balance (set_left node (insert_tree (get_left node) key value))))
+    (t (balance (set_right node (insert_tree (get_right node) key value))))))
 
 (defun get_value_tree (node key)
   (cond
@@ -119,6 +137,98 @@
     ((universal< key (get_key node)) (get_value_tree (get_left node) key))
     (t (get_value_tree (get_right node) key))))
 
-(print_tree (insert (insert (insert (insert (insert nil 5 5) 4 4) 3 3) 2 2) 1 1) 0)
-(terpri)
-(print (get_value_tree (insert (insert (insert (insert (insert nil 5 5) 4 4) 3 3) 2 2) 1 1) 3))
+(defun set_value_tree (node key value)
+  (cond
+    ((not node) nil)
+    ((universal= (get_key node) key) (set_value node value))
+    ((universal< key (get_key node)) (set_left node (set_value_tree (get_left node) key value)))
+    (t (set_right node (set_value_tree (get_right node) key value)))))
+
+(defun find_min (node)
+  (if (not (get_left node))
+    node
+    (find_min (get_left node))))
+
+(defun remove_min (node)
+  (if (not (get_left node))
+    (get_right node)
+    (balance (set_left node (remove_min (get_left node))))))
+
+(defun remove_tree (node key)
+  (balance (cond
+    ((not node) nil)
+    ((universal< key (get_key node)) (set_left node (remove_tree (get_left node) key)))
+    ((universal> key (get_key node)) (set_right node (remove_tree (get_right node) key)))
+    (t (let ((q (get_left node)) (r (get_right node)))
+        (if (not r) 
+          q
+          (let ((min (find_min r)))
+            (set_right min (remove_min r))
+            (set_left min q)
+            (balance min))))))))
+
+(defun filter_tree (node fun)
+  (if (not node)
+  nil
+  (progn
+    (set_left node (filter_tree (get_left node) fun))
+    (set_right node (filter_tree (get_right node) fun))
+    (if (funcall fun (get_key node) (get_value node))
+      (remove_tree node (get_key node))
+      (balance node)))))
+
+(defun filter_tree (node fun)
+  (if (not node)
+  nil
+  (progn
+    (set_left node (filter_tree (get_left node) fun))
+    (set_right node (filter_tree (get_right node) fun))
+    (if (funcall fun (get_key node) (get_value node))
+      (remove_tree node (get_key node))
+      (balance node)))))
+
+(defun map_tree (node fun)
+  (if (not node)
+    nil
+    (progn
+      (set_left node (map_tree (get_left node) fun))
+      (set_right node (map_tree (get_right node) fun))
+      (set_value node (funcall fun (get_value node))))))
+
+(defun reduce_tree_left (node fun zero)
+  (if (not node)
+    zero
+    (funcall fun 
+      (reduce_tree_left (get_left node) fun zero) 
+      (funcall fun 
+        (reduce_tree_left (get_right node) fun zero) 
+        (get_value node)))))
+
+(defun reduce_tree_right (node fun zero)
+  (if (not node)
+    zero
+    (funcall fun 
+      (get_value node)
+      (funcall fun 
+        (reduce_tree_right (get_right node) fun zero) 
+        (reduce_tree_right (get_left node) fun zero)))))
+
+(defun is_key_in_tree (node key)
+  (cond 
+    ((not node) 0)
+    ((universal= key (get_key node)) 1)
+    (t  (+ (is_key_in_tree (get_left node) key) (is_key_in_tree (get_right node) key)))))
+
+(defun summ_tree (node1 node2)
+  (cond
+    ((not node2) node1)
+    ((not node1) node2)
+    ((= (is_key_in_tree node1 (get_key node2)) 1)
+      (let ((node1_tmp (summ_tree (summ_tree node1 (get_right node2)) (get_left node2))))
+      (set_value_tree
+        node1_tmp
+        (get_key node2) (universal+ (get_value_tree node1_tmp (get_key node2)) (get_value node2)))))
+    (t
+      (insert_tree 
+        (summ_tree (summ_tree node1 (get_right node2)) (get_left node2))
+        (get_key node2) (get_value node2)))))
