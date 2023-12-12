@@ -57,6 +57,31 @@
     (print_node node)
     (print_tree (get_left node) (+ n 1)))))
 
+(define-condition types_not_equal (error)
+  ())
+
+(defun type_equal (t1 t2)
+  (and (subtypep t1 t2)
+       (subtypep t2 t1)))
+
+(defun universal< (n1 n2)
+  (cond
+    ((type_equal 'n1 'n2)
+      (make-condition 'types_not_equal))
+    ((typep n1 'string) 
+      (string< n1 n2))
+    (t 
+      (< n1 n2))))
+
+(defun universal= (n1 n2)
+  (cond
+    ((type_equal 'n1 'n2)
+      (make-condition 'types_not_equal))
+    ((typep n1 'string) 
+      (string= n1 n2))
+    (t 
+      (= n1 n2))))
+
 (defun rotate_rigth (p)
   (let ((q (get_left p)))
   (set_left p (get_right q))
@@ -84,16 +109,16 @@
 (defun insert (node key value)
   (cond
     ((not node) (create_node key value))
-    ((string< key (get_key node)) (balance (set_left node (insert (get_left node) key value))))
+    ((universal< key (get_key node)) (balance (set_left node (insert (get_left node) key value))))
     (t (balance (set_right node (insert (get_right node) key value))))))
 
 (defun get_value_tree (node key)
   (cond
     ((not node) nil)
-    ((string= (get_key node) key) (get_value node))
-    ((string< key (get_key node)) (get_value_tree (get_left node) key))
+    ((universal= (get_key node) key) (get_value node))
+    ((universal< key (get_key node)) (get_value_tree (get_left node) key))
     (t (get_value_tree (get_right node) key))))
 
-(print_tree (insert (insert (insert (insert (insert nil "e" 5) "d" 4) "c" 3) "b" 2) "a" 1) 0)
+(print_tree (insert (insert (insert (insert (insert nil 5 5) 4 4) 3 3) 2 2) 1 1) 0)
 (terpri)
-(print (get_value_tree (insert (insert (insert (insert (insert nil "e" 5) "d" 4) "c" 3) "b" 2) "a" 1) "c"))
+(print (get_value_tree (insert (insert (insert (insert (insert nil 5 5) 4 4) 3 3) 2 2) 1 1) 3))
