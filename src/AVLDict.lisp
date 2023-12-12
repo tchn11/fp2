@@ -177,16 +177,6 @@
 	  (remove_tree node (get_key node))
 	(balance node)))))
 
-(defun filter_tree (node fun)
-  (if (not node)
-      nil
-    (progn
-      (set_left node (filter_tree (get_left node) fun))
-      (set_right node (filter_tree (get_right node) fun))
-      (if (funcall fun (get_key node) (get_value node))
-	  (remove_tree node (get_key node))
-	(balance node)))))
-
 (defun map_tree (node fun)
   (if (not node)
       nil
