@@ -6,9 +6,9 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
       - name: Format files
-        run: sudo apt install emacs; bash ./lisp-format src/AVLDict.lisp > AVLDict_form.lisp
+        run: sudo apt install emacs; bash ./lisp-format src/AVLDict.lisp > AVLDict_form.lisp; bash ./lisp-format src/utils.lisp > utils_form.lisp
       - name: Compare with format
-        run: diff src/AVLDict.lisp AVLDict_form.lisp
+        run: diff src/AVLDict.lisp AVLDict_form.lisp; diff src/utils.lisp utils_form.lisp
   test:
     runs-on: ubuntu-latest
     steps:
