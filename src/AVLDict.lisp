@@ -3,8 +3,8 @@
 (defun insert_tree (node key value)
   (cond
    ((not node) (create_node key value))
-   ((universal< key (get_key node)) (balance (set_left node (insert_tree (get_left node) key value))))
-   (t (balance (set_right node (insert_tree (get_right node) key value))))))
+   ((universal< key (get_key node)) (balance (set_left (copy_node node) (insert_tree (get_left node) key value))))
+   (t (balance (set_right (copy_node node) (insert_tree (get_right node) key value))))))
 
 (defun get_value_tree (node key)
   (cond
@@ -16,22 +16,22 @@
 (defun set_value_tree (node key value)
   (cond
    ((not node) nil)
-   ((universal= (get_key node) key) (set_value node value))
-   ((universal< key (get_key node)) (set_left node (set_value_tree (get_left node) key value)))
-   (t (set_right node (set_value_tree (get_right node) key value)))))
+   ((universal= (get_key node) key) (set_value (copy_node_with_child node) value))
+   ((universal< key (get_key node)) (set_left (copy_node node) (set_value_tree (get_left node) key value)))
+   (t (set_right (copy_node node) (set_value_tree (get_right node) key value)))))
 
 (defun remove_tree (node key)
   (balance (cond
 	    ((not node) nil)
-	    ((universal< key (get_key node)) (set_left node (remove_tree (get_left node) key)))
-	    ((universal> key (get_key node)) (set_right node (remove_tree (get_right node) key)))
-	    (t (let ((q (get_left node)) (r (get_right node)))
+	    ((universal< key (get_key node)) (set_left (copy_node node) (remove_tree (get_left node) key)))
+	    ((universal> key (get_key node)) (set_right (copy_node node) (remove_tree (get_right node) key)))
+	    (t (let ((new_node (copy_node_with_child node))) (let ((q (get_left new_node)) (r (get_right new_node)))
 		 (if (not r)
 		     q
 		   (let ((min (find_min r)))
 		     (set_right min (remove_min r))
 		     (set_left min q)
-		     (balance min))))))))
+		     (balance min)))))))))
 
 (defun filter_tree (node fun)
   (if (not node)
@@ -49,7 +49,7 @@
     (progn
       (set_left node (map_tree (get_left node) fun))
       (set_right node (map_tree (get_right node) fun))
-      (set_value node (funcall fun (get_value node))))))
+      (set_value (copy_node node) (funcall fun (get_value node))))))
 
 (defun reduce_tree_left (node fun zero)
   (if (not node)
@@ -77,10 +77,10 @@
 
 (defun summ_tree (node1 node2)
   (cond
-   ((not node2) node1)
-   ((not node1) node2)
+   ((not node2) (copy_node node1))
+   ((not node1) (copy_node node2))
    ((= (is_key_in_tree node1 (get_key node2)) 1)
-    (let ((node1_tmp (summ_tree (summ_tree node1 (get_right node2)) (get_left node2))))
+    (let ((node1_tmp (summ_tree (summ_tree (copy_node node1) (get_right node2)) (get_left node2))))
       (set_value_tree
        node1_tmp
        (get_key node2) (universal+ (get_value_tree node1_tmp (get_key node2)) (get_value node2)))))

@@ -14,6 +14,12 @@
   (set_right node_parent node_child_r)
   node_parent)
 
+(defun copy_node (node)
+  (set_left_right (create_node (get_key node) (get_value node)) (get_left node) (get_right node)))
+
+(defun copy_node_with_child (node)
+  (set_left_right (create_node (get_key node) (get_value node)) (copy-list (get_left node)) (copy-list (get_right node))))
+
 (defun get_left (node)
   (car node))
 
