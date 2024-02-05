@@ -26,12 +26,12 @@
 	    ((universal< key (get_key node)) (set_left (copy_node node) (remove_tree (get_left node) key)))
 	    ((universal> key (get_key node)) (set_right (copy_node node) (remove_tree (get_right node) key)))
 	    (t (let ((new_node (copy_node_with_child node))) (let ((q (get_left new_node)) (r (get_right new_node)))
-		 (if (not r)
-		     q
-		   (let ((min (find_min r)))
-		     (set_right min (remove_min r))
-		     (set_left min q)
-		     (balance min)))))))))
+     (if (not r)
+         q
+       (let ((min (find_min r)))
+         (set_right min (remove_min r))
+         (set_left min q)
+         (balance min)))))))))
 
 (defun filter_tree (node fun)
   (if (not node)
