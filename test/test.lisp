@@ -116,6 +116,11 @@
 				   	(lisp-unit:assert-true 
 						(eq_tree (summ_tree tree1 tree2) (summ_tree tree2 tree1)))))
 
+(lisp-unit:define-test immutable_test
+				(let ((tree (create_random_tree 20)))
+				   	(lisp-unit:assert-false 
+						(eq_tree tree (insert_tree tree 21 21)))))
+
 (lisp-unit:define-test poly_test
 		       (lisp-unit:assert-equal '((NIL NIL "a" 1) (NIL NIL "c" NIL) "b" "a")
 			   							(insert_tree (insert_tree (insert_tree nil "c" nil) "b" "a") "a" 1)))
