@@ -8,6 +8,12 @@
 			(setq tree (insert_tree tree i i)))
 		tree))
 
+(defun create_random_tree (size)
+	(let ((tree nil))
+		(dotimes (i size)
+			(setq tree (insert_tree tree (random size) i)))
+		tree))
+
 (lisp-unit:define-test tree_create
 		       (lisp-unit:assert-equal '(nil nil "Head" 1) 
 			   							(insert_tree nil "Head" 1)))
@@ -87,15 +93,28 @@
 		       (lisp-unit:assert-equal '((NIL NIL "a" "ab") (NIL NIL "c" "b") "b" "ab")
 			   							(summ_tree (insert_tree (insert_tree nil "a" "a") "b" "a") (insert_tree (insert_tree (insert_tree nil "a" "b") "b" "b") "c" "b"))))
 
+(lisp-unit:define-test eq_tree_true
+				(lisp-unit:assert-true (eq_tree (insert_tree (insert_tree nil "a" "a") "b" "a") (insert_tree (insert_tree nil "b" "a") "a" "a"))))
+
+(lisp-unit:define-test eq_tree_false
+				(lisp-unit:assert-false (eq_tree (insert_tree (insert_tree nil "a" "a") "b" "b") (insert_tree (insert_tree nil "b" "a") "a" "a"))))
+
 ; Property - based
 
 (lisp-unit:define-test summ_tree_zero1
-		       (lisp-unit:assert-equal (create_big_tree)
-			   							(summ_tree (create_big_tree) nil)))
+			   (let ((tree (create_random_tree 20)))
+				   	(lisp-unit:assert-true 
+						(eq_tree tree (summ_tree tree nil)))))
 
 (lisp-unit:define-test summ_tree_zero2
-		       (lisp-unit:assert-equal (create_big_tree)
-			   							(summ_tree nil (create_big_tree))))
+				(let ((tree (create_random_tree 20)))
+				   	(lisp-unit:assert-true 
+						(eq_tree tree (summ_tree nil tree)))))
+
+(lisp-unit:define-test summ_tree_commut
+				(let ((tree1 (create_random_tree 20)) (tree2 (create_random_tree 20)))
+				   	(lisp-unit:assert-true 
+						(eq_tree (summ_tree tree1 tree2) (summ_tree tree2 tree1)))))
 
 (lisp-unit:define-test poly_test
 		       (lisp-unit:assert-equal '((NIL NIL "a" 1) (NIL NIL "c" NIL) "b" "a")

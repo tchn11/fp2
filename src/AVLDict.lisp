@@ -3,6 +3,7 @@
 (defun insert_tree (node key value)
   (cond
    ((not node) (create_node key value))
+   ((universal= (get_key node) key) (set_value (copy_node_with_child node) value))
    ((universal< key (get_key node)) (balance (set_left (copy_node node) (insert_tree (get_left node) key value))))
    (t (balance (set_right (copy_node node) (insert_tree (get_right node) key value))))))
 
@@ -88,3 +89,22 @@
     (insert_tree
      (summ_tree (summ_tree node1 (get_right node2)) (get_left node2))
      (get_key node2) (get_value node2)))))
+
+(defun count_tree (node)
+  (if node
+    (+ (+ (count_tree (get_left node)) (count_tree (get_right node))) 1)
+    0))
+
+(defun eq_tree (node1 node2)
+  (if (= (count_tree node1) (count_tree node2))
+   (eq_tree_req node1 node2)
+   nil))
+
+(defun eq_tree_req (node1 node2)
+  (if node2
+    (and
+      (is_key_in_tree node1 (get_key node2)) 
+      (universal= (get_value_tree node1 (get_key node2)) (get_value node2))
+      (eq_tree_req node1 (get_left node2))
+      (eq_tree_req node1 (get_right node2)))
+    t))
