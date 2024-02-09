@@ -3,7 +3,7 @@
 (defun insert_tree (node key value)
   (cond
    ((not node) (create_node key value))
-   ((universal= (get_key node) key) (set_value (copy_node_with_child node) value))
+   ((universal= (get_key node) key) (set_value (copy_node node) value))
    ((universal< key (get_key node)) (balance (set_left (copy_node node) (insert_tree (get_left node) key value))))
    (t (balance (set_right (copy_node node) (insert_tree (get_right node) key value))))))
 
@@ -17,7 +17,7 @@
 (defun set_value_tree (node key value)
   (cond
    ((not node) nil)
-   ((universal= (get_key node) key) (set_value (copy_node_with_child node) value))
+   ((universal= (get_key node) key) (set_value (copy_node node) value))
    ((universal< key (get_key node)) (set_left (copy_node node) (set_value_tree (get_left node) key value)))
    (t (set_right (copy_node node) (set_value_tree (get_right node) key value)))))
 

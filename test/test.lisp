@@ -102,24 +102,24 @@
 ; Property - based
 
 (lisp-unit:define-test summ_tree_zero1
-			   (let ((tree (create_random_tree 20)))
+			   (let ((tree (create_random_tree 100)))
 				   	(lisp-unit:assert-true 
 						(eq_tree tree (summ_tree tree nil)))))
 
 (lisp-unit:define-test summ_tree_zero2
-				(let ((tree (create_random_tree 20)))
+				(let ((tree (create_random_tree 100)))
 				   	(lisp-unit:assert-true 
 						(eq_tree tree (summ_tree nil tree)))))
 
 (lisp-unit:define-test summ_tree_commut
-				(let ((tree1 (create_random_tree 20)) (tree2 (create_random_tree 20)))
-				   	(lisp-unit:assert-true 
+				(let ((tree1 (create_random_tree 100)) (tree2 (create_random_tree 100)))
+				   	(lisp-unit:assert-true
 						(eq_tree (summ_tree tree1 tree2) (summ_tree tree2 tree1)))))
 
 (lisp-unit:define-test immutable_test
-				(let ((tree (create_random_tree 20)))
+				(let ((tree (create_random_tree 100)))
 				   	(lisp-unit:assert-false 
-						(eq_tree tree (insert_tree tree 21 21)))))
+						(eq_tree tree (insert_tree tree 101 101)))))
 
 (lisp-unit:define-test poly_test
 		       (lisp-unit:assert-equal '((NIL NIL "a" 1) (NIL NIL "c" NIL) "b" "a")
